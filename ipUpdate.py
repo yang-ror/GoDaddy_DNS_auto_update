@@ -63,4 +63,31 @@ def getGodaddyIP():
 def getPubIp():
     response = requests.get('https://api.ipify.org') # Send a GET request to the ipify API to get the current public IP address
     ip_address = response.text # Extract the IP address from the response
-    #print
+    #print(ip_address)
+    return ip_address
+
+#Define the updateIP function
+def updateIP(pubIp):
+    global godaddy_ip
+
+    data = [{
+        "data": pubIp,
+        "port": 65535,
+        "priority": 0,
+        "protocol": "string",
+        "service": "string",
+        "ttl": 600,
+        "weight": 1
+    }]
+    
+    response = requests.put(godaddy_api, headers=headers, data=json.dumps(data)) # Send a PUT request to the GoDaddy API to update the IP address for the given domain and subdomain
+    now = datetime.datetime.now()
+
+    if response.status_code == 200: # If the response status code is 200, the update was successful
+        print(now, Fore.YELLOW + 'IP is updated' + Style.RESET_ALL)
+        godaddy_ip = pubIp # Update the godaddy_ip variable with the new IP address
+    else: # If the update was not successful, print an error message to the console
+        print(now, Fore.RED + 'Failed to update' + Style.RESET_ALL)
+
+if __name__ == '__main__':
+    main()
